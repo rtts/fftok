@@ -42,10 +42,12 @@ then
            -crf "$quality" \
            -c:a copy \
            -filter:v "crop=$secret_formula" \
+           -movflags +faststart \
            "$output_filename"
 else
     ffmpeg -ss "$start_ts" \
            -i "$input_filename" \
+           -ss "$start_ts" \
            -to "$end_ts" \
            -copyts \
            -c:v libx264 \
@@ -53,6 +55,7 @@ else
            -crf "$quality" \
            -c:a copy \
            -filter:v "crop=$secret_formula" \
+           -movflags +faststart \
            "$output_filename"
 fi
 
