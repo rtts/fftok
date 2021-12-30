@@ -28,12 +28,19 @@ case $# in
         ;;
 esac
 
-secret_formula="in_w*9/16*9/16:in_w*9/16:0.5*in_w-0.5*out_w:0"
+offset=0
+ratio=9/16
+speed=ultrafast
+quality=17
+secret_formula="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$offset:0"
 
 if [[ -z "$start_ts" ]]
 then
     ffmpeg -i "$input_filename" \
            -c:v libx264 \
+           -preset "$speed" \
+           -crf "$quality" \
+           -c:a copy \
            -filter:v "crop=$secret_formula" \
            "$output_filename"
 else
@@ -42,6 +49,9 @@ else
            -to "$end_ts" \
            -copyts \
            -c:v libx264 \
+           -preset "$speed" \
+           -crf "$quality" \
+           -c:a copy \
            -filter:v "crop=$secret_formula" \
            "$output_filename"
 fi
