@@ -46,4 +46,4 @@ else
            "$output_filename"
 fi
 
-ffplay "$output_filename"
+ffplay -loop 0 "$output_filename"
