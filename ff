@@ -1,11 +1,43 @@
 #!/bin/bash
+usage() {
+    cat <<EOF
 
+FFtok - Converts long, horizontal videos to short, vertical videos
+
+Synopsis:
+    $(basename $0) [options] [HH:MM:SS(.xxx) HH:MM:SS(.xxx)] input.mp4 [output.mp4]
+
+Options:
+    -p Pan camera left/right (defaults to 0)
+    -q Quality from 0 to 50 (defaults to 17)
+    -r Aspect ratio of output (defaults to 9/16)
+    -s Speed of transcoding (defaults to ultrafast, results in larger file size)
+
+EOF
+    exit 1
+}
+
+pan=0
+quality=17
+ratio=9/16
+speed=ultrafast
+
+# Parse options
+while getopts "p:q:r:s:" opt; do
+    case $opt in
+        p) pan="$OPTARG";;
+        q) quality="$OPTARG";;
+        r) ratio="$OPTARG";;
+        s) speed="$OPTARG";;
+        *) usage;;
+    esac
+done
+shift "$((OPTIND-1))"
+
+# Parse arguments
 case $# in
     0)
-        echo "Convert long, horizontal videos to short, vertical videos suitable for TikTok"
-        echo "Usage: $(basename $0) [HH:MM:SS(.xxx) HH:MM:SS(.xxx)] input.mp4 [output.mp4]"
-        exit 1
-        ;;
+        usage;;
     1)
         input_filename="$1"
         output_filename="${1%.*}"_cropped."${1##*.}"
@@ -28,11 +60,7 @@ case $# in
         ;;
 esac
 
-offset=0
-ratio=9/16
-speed=ultrafast
-quality=17
-secret_formula="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$offset:0"
+secret_formula="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$pan:0"
 
 if [[ -z "$start_ts" ]]
 then
@@ -40,7 +68,7 @@ then
            -c:v libx264 \
            -preset "$speed" \
            -crf "$quality" \
-           -c:a copy \
+           -c:a aac \
            -filter:v "crop=$secret_formula" \
            -movflags +faststart \
            "$output_filename"
@@ -53,7 +81,7 @@ else
            -c:v libx264 \
            -preset "$speed" \
            -crf "$quality" \
-           -c:a copy \
+           -c:a aac \
            -filter:v "crop=$secret_formula" \
            -movflags +faststart \
            "$output_filename"
