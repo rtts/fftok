@@ -40,7 +40,7 @@ case $# in
         usage;;
     1)
         input_filename="$1"
-        output_filename="${1%.*}"_cropped."${1##*.}"
+        output_filename="${1%.*}"_cropped.mp4
         ;;
     2)
         input_filename="$1"
@@ -50,7 +50,7 @@ case $# in
         start_ts="$1"
         end_ts="$2"
         input_filename="$3"
-        output_filename="${3%.*}"_"$1"-"$2"."${3##*.}"
+        output_filename="${3%.*}"_"$1"-"$2".mp4
         ;;
     4)
         start_ts="$1"
@@ -69,7 +69,7 @@ then
            -preset "$speed" \
            -crf "$quality" \
            -c:a aac \
-           -filter:v "crop=$secret_formula" \
+           -filter:v "crop=$secret_formula, format=yuv420p" \
            -movflags +faststart \
            "$output_filename"
 else
@@ -82,7 +82,7 @@ else
            -preset "$speed" \
            -crf "$quality" \
            -c:a aac \
-           -filter:v "crop=$secret_formula" \
+           -filter:v "crop=$secret_formula, format=yuv420p" \
            -movflags +faststart \
            "$output_filename"
 fi
