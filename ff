@@ -61,9 +61,8 @@ case $# in
 esac
 
 # Calculate variables
-resolution=3840 # 4K
 crop="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$pan:0"
-scale="$(($resolution * $ratio)):$resolution"
+scale="2160:$((2160 * ${ratio#*/}/${ratio%/*}))"
 [[ -n "$start_ts" ]] && cuts="
        -ss $start_ts
        -i $input_filename
