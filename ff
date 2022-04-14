@@ -60,31 +60,27 @@ case $# in
         ;;
 esac
 
-secret_formula="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$pan:0"
+# Calculate variables
+resolution=3840 # 4K
+crop="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$pan:0"
+scale="$(($resolution * $ratio)):$resolution"
+[[ -n "$start_ts" ]] && cuts="
+       -ss $start_ts
+       -i $input_filename
+       -ss $start_ts
+       -to $end_ts
+       -copyts
+" || cuts="-i $input_filename"
 
-if [[ -z "$start_ts" ]]
-then
-    ffmpeg -i "$input_filename" \
-           -c:v libx264 \
-           -preset "$speed" \
-           -crf "$quality" \
-           -c:a aac \
-           -filter:v "crop=$secret_formula, format=yuv420p" \
-           -movflags +faststart \
-           "$output_filename"
-else
-    ffmpeg -ss "$start_ts" \
-           -i "$input_filename" \
-           -ss "$start_ts" \
-           -to "$end_ts" \
-           -copyts \
-           -c:v libx264 \
-           -preset "$speed" \
-           -crf "$quality" \
-           -c:a aac \
-           -filter:v "crop=$secret_formula, format=yuv420p" \
-           -movflags +faststart \
-           "$output_filename"
-fi
+# Call ffmpeg
+ffmpeg $cuts \
+       -c:v libx264 \
+       -preset "$speed" \
+       -crf "$quality" \
+       -c:a aac \
+       -filter:v "crop=$crop, scale=$scale, format=yuv420p" \
+       -movflags +faststart \
+       "$output_filename"
 
+# Loop the video
 ffplay -loop 0 "$output_filename"
