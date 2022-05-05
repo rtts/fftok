@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 usage() {
     cat <<EOF
 
@@ -61,8 +61,11 @@ case $# in
 esac
 
 # Calculate variables
+out_w=2160
+out_h="$((2160 * ${ratio#*/}/${ratio%/*}))"
 crop="in_h*$ratio:in_h:0.5*in_w-0.5*out_w+$pan:0"
-scale="2160:$((2160 * ${ratio#*/}/${ratio%/*}))"
+scale="$out_w:$out_h"
+pad="ceil($out_w/2)*2:ceil($out_h/2)*2"
 [[ -n "$start_ts" ]] && cuts="
        -ss $start_ts
        -i $input_filename
@@ -77,7 +80,7 @@ ffmpeg $cuts \
        -preset "$speed" \
        -crf "$quality" \
        -c:a aac \
-       -filter:v "crop=$crop, scale=$scale, format=yuv420p" \
+       -filter:v "crop=$crop, scale=$scale, pad=$pad, format=yuv420p" \
        -movflags +faststart \
        "$output_filename"
 
