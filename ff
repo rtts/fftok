@@ -64,8 +64,8 @@ esac
 out_w=2160
 out_h="$((out_w * ${ratio#*/}/${ratio%/*}))"
 crop="min(in_h*$ratio\,in_w):in_h:0.5*in_w-0.5*out_w+$pan:0"
-scale="$out_w:max($out_h\,in_h)"
-pad="ceil($out_w/2)*2:ceil(max($out_h/2\,in_h/2))*2"
+scale="$out_w:max($out_h\,in_h*($out_w/in_w))"
+pad="ceil($out_w/2)*2:ceil(max($out_h/2\,in_h*($out_w/in_w)/2))*2"
 
 if [[ -n "$start_ts" ]]
 then
