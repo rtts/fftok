@@ -93,6 +93,7 @@ call ffmpeg "${cuts[@]}" \
        -c:a aac \
        -filter:v "crop=$crop,scale=$scale,pad=$pad,format=yuv420p" \
        -movflags +faststart \
+       -r 30 \
        "$output_filename"
 
 # Loop the video
