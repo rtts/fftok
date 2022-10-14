@@ -5,7 +5,7 @@ usage() {
 FFtok - Converts long, horizontal videos to short, vertical videos
 
 Synopsis:
-    $(basename $0) [options] [HH:MM:SS(.xxx) HH:MM:SS(.xxx)] input.mp4 [output.mp4]
+    $(basename $0) [options] input.mp4 output.mp4
 
 Options:
     -p Pan camera left/right (defaults to 0)
@@ -15,6 +15,11 @@ Options:
 
 EOF
     exit 1
+}
+
+call() {
+    echo "Executing: $@"
+    "$@"
 }
 
 pan=0
@@ -35,30 +40,14 @@ done
 shift "$((OPTIND-1))"
 
 # Parse arguments
-case $# in
-    0)
-        usage;;
-    1)
-        input_filename="$1"
-        output_filename="${1%.*}"_cropped.mp4
-        ;;
-    2)
-        input_filename="$1"
-        output_filename="$2"
-        ;;
-    3)
-        start_ts="$1"
-        end_ts="$2"
-        input_filename="$3"
-        output_filename="${3%.*}"_"$1"-"$2".mp4
-        ;;
-    4)
-        start_ts="$1"
-        end_ts="$2"
-        input_filename="$3"
-        output_filename="$4"
-        ;;
-esac
+if [[ $# -ne 2 ]]
+then
+   usage
+   exit 1
+fi
+
+input="$1"
+output="$2"
 
 # Calculate variables
 out_w=2160
@@ -67,26 +56,8 @@ crop="min(in_h*$ratio\,in_w):in_h:0.5*in_w-0.5*out_w+$pan:0"
 scale="$out_w:max($out_h\,in_h*($out_w/in_w))"
 pad="ceil($out_w/2)*2:ceil(max($out_h/2\,in_h*($out_w/in_w)/2))*2"
 
-if [[ -n "$start_ts" ]]
-then
-    cuts=(
-        "-ss" "$start_ts"
-        "-i" "$input_filename"
-        "-ss" "$start_ts"
-        "-to" "$end_ts"
-        "-copyts"
-    )
-else
-    cuts=("-i" "$input_filename")
-fi
-
-call() {
-    echo "Executing: $@"
-    "$@"
-}
-
 # Call ffmpeg
-call ffmpeg "${cuts[@]}" \
+call ffmpeg -i "$input" \
        -c:v libx264 \
        -preset "$speed" \
        -crf "$quality" \
@@ -94,7 +65,7 @@ call ffmpeg "${cuts[@]}" \
        -filter:v "crop=$crop,scale=$scale,pad=$pad,format=yuv420p" \
        -movflags +faststart \
        -r 30 \
-       "$output_filename"
+       "$output"
 
 # Loop the video
-ffplay -loop 0 "$output_filename"
+ffplay -loop 0 "$output"
