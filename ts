@@ -2,84 +2,57 @@
 usage() {
     cat <<EOF
 
-TimeStamp - Specify a list of timestamps at which to cut video
+Cut video into intermediary ts files
 
 Synopsis:
-    $(basename $0) INPUT_FILE [even number of timestamps] OUTPUT_FILE
+    $(basename $0) INPUT_FILE [even number of timestamps]
 
 EOF
     exit 1
 }
 
-call() {
-    echo "Executing: $@"
-    "$@"
-}
-
-join() {
-    while [[ $# -gt 1 ]]
-    do
-        echo -n "$1|"
-        shift
-    done
-    echo -n "$1"
-}
-
-if ls *.ts 2> /dev/null
+if [[ $# -lt 3 ]]
 then
-    echo "Cleanup your mess!"
-    exit 1
+    usage
 fi
 
-if [[ $# -lt 4 ]]
-then
-    echo "Not enough arguments."
-    exit 1
-fi
-
-if [[ !$(($#%2)) -eq 0 ]]
+if [[ !$(($#%2)) -eq 1 ]]
 then
     echo "Uneven number of timestamps."
     exit 1
 fi
 
 input="$1"
-shift
-
-# Create an intermediate TS file for each fragment
+output="${1%.*}"
 fragment=1
-while [[ $# -ne 1 ]]
+join=()
+
+shift
+while [[ $# -ne 0 ]]
 do
-    from=$1
-    to=$2
+    from="$1"
+    to="$2"
+    join+=("$output.$fragment.ts")
     shift
     shift
-    # Call ffmpeg
-    call ffmpeg \
-         -fflags +genpts \
-         -ss "$from" \
-         -i "$input" \
-         -ss "$from" \
-         -to "$to" \
-         -copyts \
-         -c:v copy \
-         -c:a copy \
-         "$fragment.ts"
-    touch $fragment.ts
+    ffmpeg \
+        -fflags +genpts+igndts \
+        -ss "$from" \
+        -i "$input" \
+        -ss "$from" \
+        -to "$to" \
+        -copyts \
+        -c:v libx264 \
+        -preset ultrafast \
+        -c:a copy \
+        "$output.$fragment.ts"
     ((fragment++))
 done
 
-output="$1"
-
-# Join all fragments to a single output file
-call ffmpeg \
-     -i "concat:$(join $(ls *.ts))" \
-     -c:v copy \
-     -c:a copy \
-     "$output"
-
-# Delete intermediary files
-rm *.ts
-
-# Loop the video
-ffplay -loop 0 "$output"
+if [[ ${#join[@]} -eq 1 ]]
+then
+    mv "${join[@]}" "$output.ts"
+    ffplay -loop 0 "$output.ts"
+else
+    cc "${join[@]}" "$output.ts"
+fi

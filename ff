@@ -2,10 +2,10 @@
 usage() {
     cat <<EOF
 
-FFtok - Converts long, horizontal videos to short, vertical videos
+Convert input to video suitable for TikTok
 
 Synopsis:
-    $(basename $0) [options] input.mp4 output.mp4
+    $(basename $0) [options] input.mp4 [output.mp4]
 
 Options:
     -p Pan camera left/right (defaults to 0)
@@ -15,11 +15,6 @@ Options:
 
 EOF
     exit 1
-}
-
-call() {
-    echo "Executing: $@"
-    "$@"
 }
 
 pan=0
@@ -39,17 +34,13 @@ while getopts "p:q:r:s:" opt; do
 done
 shift "$((OPTIND-1))"
 
-# Parse arguments
-if [[ $# -ne 2 ]]
+if [[ -z "$1" ]]
 then
    usage
-   exit 1
 fi
 
 input="$1"
-output="$2"
-
-# Calculate variables
+output="${2:-out.mp4}"
 out_w=2160
 out_h="$((out_w * ${ratio#*/}/${ratio%/*}))"
 crop="min(in_h*$ratio\,in_w):in_h:0.5*in_w-0.5*out_w+$pan:0"
@@ -57,15 +48,16 @@ scale="$out_w:max($out_h\,in_h*($out_w/in_w))"
 pad="ceil($out_w/2)*2:ceil(max($out_h/2\,in_h*($out_w/in_w)/2))*2"
 
 # Call ffmpeg
-call ffmpeg -i "$input" \
-       -c:v libx264 \
-       -preset "$speed" \
-       -crf "$quality" \
-       -c:a aac \
-       -filter:v "crop=$crop,scale=$scale,pad=$pad,format=yuv420p" \
-       -movflags +faststart \
-       -r 30 \
-       "$output"
+ffmpeg \
+    -i "$input" \
+    -c:v libx264 \
+    -preset "$speed" \
+    -crf "$quality" \
+    -c:a aac \
+    -filter:v "crop=$crop,scale=$scale,pad=$pad,format=yuv420p" \
+    -movflags +faststart \
+    -r 30 \
+    "$output"
 
 # Loop the video
 ffplay -loop 0 "$output"
