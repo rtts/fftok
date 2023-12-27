@@ -54,5 +54,5 @@ then
     mv "${join[@]}" "$output.ts"
     ffplay -loop 0 "$output.ts"
 else
-    cc "${join[@]}" "$output.ts"
+    cc1 "${join[@]}" "$output.ts"
 fi

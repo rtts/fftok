@@ -1,0 +1,36 @@
+#!/bin/bash -e
+usage() {
+    cat <<EOF
+
+Concatenate video files
+
+Synopsis:
+    $(basename $0) [INPUT_FILES] OUTPUT_FILE
+
+EOF
+    exit 1
+}
+
+if [[ $# -lt 3 ]]
+then
+   usage
+fi
+
+input=$(
+    for arg in "${@:1:$#-1}"
+    do
+        echo file \'$(realpath "$arg")\'
+    done
+)
+output="${@: -1}"
+
+ffmpeg \
+    -f concat \
+    -safe 0 \
+    -i <(echo "$input") \
+    -c:v copy \
+    -c:a copy \
+    "$output"
+
+# Loop the video
+ffplay -loop 0 "$output"
