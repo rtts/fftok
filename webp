@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Convert video to animated WEBP.
+
+if [[ $# -lt 3 ]]
+then
+    echo Usage: webp video.mp4 00:00:01.5 00:00:02.5
+    exit 1
+fi
+
+input="$1"
+output="${1%.*}.webp"
+from="$2"
+to="$3"
+
+ffmpeg \
+  -ss "$from" \
+  -to "$to" \
+  -i "$input" \
+  -loop 0 \
+  -vf fps=12 \
+  "$output"
+
+chromium "$output"
