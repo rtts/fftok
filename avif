@@ -22,7 +22,8 @@ then
        -r 30 \
        -i "$input" \
        -vf "setpts=4*PTS,
-            crop=ih*(1+sqrt(5))/2:ih" \
+            crop=ih*(1+sqrt(5))/2:ih,
+            format=yuv420p" \
        -r 7.5 \
        -c:v libsvtav1 \
        -crf 9 \
@@ -33,15 +34,11 @@ else
        -r 30 \
        -i "$input" \
        -vf "setpts=4*PTS,
-            crop=ih*(1+sqrt(5))/2:ih" \
+            crop=ih*(1+sqrt(5))/2:ih,
+            format=yuv420p" \
        -r 7.5 \
        -c:v libsvtav1 \
        -crf 9 \
        -preset 4 \
        "$output"
 fi
-
-exiftool \
-    -TagsFromFile "$input" \
-    '-FileModifyDate<QuickTime:CreateDate' \
-    "$output"
