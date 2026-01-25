@@ -21,30 +21,26 @@ then
        -to "$to" \
        -r 30 \
        -i "$input" \
-       -vf "setpts=4*PTS,\
-            zscale=t=smpte2084" \
+       -vf "setpts=4*PTS,
+            crop=ih*(1+sqrt(5))/2:ih,
+            zscale=transfer=bt709:primaries=bt709:matrix=bt709,
+            format=yuv420p" \
        -r 7.5 \
        -c:v libsvtav1 \
-       -pix_fmt yuv420p10le \
-       -colorspace bt2020nc \
-       -color_trc smpte2084 \
-       -color_primaries bt2020 \
-       -crf 12 \
+       -crf 8 \
        -preset 4 \
        "$output"
 else
     ffmpeg \
        -r 30 \
        -i "$input" \
-       -vf "setpts=4*PTS,\
-            zscale=t=smpte2084" \
+       -vf "setpts=4*PTS,
+            crop=ih*(1+sqrt(5))/2:ih,
+            zscale=transfer=bt709:primaries=bt709:matrix=bt709,
+            format=yuv420p" \
        -r 7.5 \
        -c:v libsvtav1 \
-       -pix_fmt yuv420p10le \
-       -colorspace bt2020nc \
-       -color_trc smpte2084 \
-       -color_primaries bt2020 \
-       -crf 12 \
+       -crf 8 \
        -preset 4 \
        "$output"
 fi
