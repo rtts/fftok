@@ -21,11 +21,10 @@ then
        -to "$to" \
        -r 30 \
        -i "$input" \
-       -vf "setpts=4*PTS, \
-            zscale=t=smpte2084:m=bt2020nc:p=bt2020" \
+       -vf "setpts=4*PTS,\
+            zscale=t=smpte2084" \
        -r 7.5 \
        -c:v libsvtav1 \
-       -svtav1-params enable-hdr=1 \
        -pix_fmt yuv420p10le \
        -colorspace bt2020nc \
        -color_trc smpte2084 \
@@ -37,11 +36,10 @@ else
     ffmpeg \
        -r 30 \
        -i "$input" \
-       -vf "setpts=4*PTS, \
-            zscale=t=smpte2084:m=bt2020nc:p=bt2020" \
+       -vf "setpts=4*PTS,\
+            zscale=t=smpte2084" \
        -r 7.5 \
        -c:v libsvtav1 \
-       -svtav1-params enable-hdr=1 \
        -pix_fmt yuv420p10le \
        -colorspace bt2020nc \
        -color_trc smpte2084 \
