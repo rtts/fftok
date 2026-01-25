@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Convert video to animated AVIF.
+# Create a cinemagraph from a few seconds of 30fps video.
 
 if [[ -z "$1" ]]
 then
@@ -24,21 +24,21 @@ then
        -vf "setpts=4*PTS,
             crop=ih*(1+sqrt(5))/2:ih,
             format=yuv420p" \
-       -r 7.5 \
        -c:v libsvtav1 \
-       -crf 9 \
-       -preset 4 \
+       -crf 10 \
+       -preset 8 \
+       -r 7.5 \
        "$output"
 else
     ffmpeg \
-       -r 30 \
-       -i "$input" \
-       -vf "setpts=4*PTS,
-            crop=ih*(1+sqrt(5))/2:ih,
-            format=yuv420p" \
-       -r 7.5 \
-       -c:v libsvtav1 \
-       -crf 9 \
-       -preset 4 \
-       "$output"
+        -r 30 \
+        -i "$input" \
+        -vf "setpts=4*PTS,
+             crop=ih*(1+sqrt(5))/2:ih,
+             format=yuv420p" \
+        -c:v libsvtav1 \
+        -crf 10 \
+        -preset 8 \
+        -r 7.5 \
+        "$output"
 fi
