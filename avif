@@ -22,12 +22,10 @@ then
        -r 30 \
        -i "$input" \
        -vf "setpts=4*PTS,
-            crop=ih*(1+sqrt(5))/2:ih,
-            zscale=transfer=bt709:primaries=bt709:matrix=bt709,
-            format=yuv420p" \
+            crop=ih*(1+sqrt(5))/2:ih" \
        -r 7.5 \
        -c:v libsvtav1 \
-       -crf 8 \
+       -crf 9 \
        -preset 4 \
        "$output"
 else
@@ -35,12 +33,10 @@ else
        -r 30 \
        -i "$input" \
        -vf "setpts=4*PTS,
-            crop=ih*(1+sqrt(5))/2:ih,
-            zscale=transfer=bt709:primaries=bt709:matrix=bt709,
-            format=yuv420p" \
+            crop=ih*(1+sqrt(5))/2:ih" \
        -r 7.5 \
        -c:v libsvtav1 \
-       -crf 8 \
+       -crf 9 \
        -preset 4 \
        "$output"
 fi
