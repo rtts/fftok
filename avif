@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create a cinemagraph from a few seconds of 100fps video.
+# Create a cinemagraph from a few seconds of 120fps video.
 
 if [[ -z "$1" ]]
 then
@@ -21,24 +21,24 @@ then
        -to "$to" \
        -r 100 \
        -i "$input" \
-       -vf "setpts=4*PTS,
+       -vf "setpts=5*PTS,
             crop=ih*(1+sqrt(5))/2:ih,
             format=yuv420p" \
        -c:v libsvtav1 \
        -crf 8 \
        -preset 8 \
-       -r 25 \
+       -r 24 \
        "$output"
 else
     ffmpeg \
         -r 100 \
         -i "$input" \
-        -vf "setpts=4*PTS,
+        -vf "setpts=5*PTS,
              crop=ih*(1+sqrt(5))/2:ih,
              format=yuv420p" \
         -c:v libsvtav1 \
         -crf 8 \
         -preset 8 \
-        -r 25 \
+        -r 24 \
         "$output"
 fi
