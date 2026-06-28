@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Do what I want.
+
+if [[ -z "$1" ]]
+then
+    echo "Usage: mp4 input.mp4 00:00:01.5 00:00:02.5"
+    exit 1
+fi
+
+input="$1"
+output="${1%.*}.mp4"
+
+if [[ -n "$3" ]]
+then
+   from="$2"
+   to="$3"
+
+   ffmpeg \
+       -ss "$from" \
+       -to "$to" \
+       -i "$input" \
+       -vf "format=yuv420p" \
+       "$output"
+else
+    ffmpeg \
+        -i "$input" \
+        -vf "format=yuv420p" \
+        "$output"
+fi
+
+ffplay -loop 0 "$output"

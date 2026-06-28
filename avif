@@ -19,25 +19,25 @@ then
    ffmpeg \
        -ss "$from" \
        -to "$to" \
-       -r 100 \
+       -r 120 \
        -i "$input" \
        -vf "setpts=5*PTS,
             crop=ih*(1+sqrt(5))/2:ih,
             format=yuv420p" \
        -c:v libsvtav1 \
-       -crf 8 \
+       -crf 20 \
        -preset 8 \
        -r 24 \
        "$output"
 else
     ffmpeg \
-        -r 100 \
+        -r 120 \
         -i "$input" \
         -vf "setpts=5*PTS,
              crop=ih*(1+sqrt(5))/2:ih,
              format=yuv420p" \
         -c:v libsvtav1 \
-        -crf 8 \
+        -crf 20 \
         -preset 8 \
         -r 24 \
         "$output"
