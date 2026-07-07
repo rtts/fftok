@@ -10,25 +10,41 @@ fi
 
 input="$1"
 output="${1%.*}.avif"
+thumbnail="${1%.*}.thumbnail.avif"
 
 if [[ -n "$3" ]]
 then
-   from="$2"
-   to="$3"
+    from="$2"
+    to="$3"
 
-   ffmpeg \
-       -ss "$from" \
-       -to "$to" \
-       -r 120 \
-       -i "$input" \
-       -vf "setpts=5*PTS,
-            crop=ih*(1+sqrt(5))/2:ih,
-            format=yuv420p" \
-       -c:v libsvtav1 \
-       -crf 20 \
-       -preset 8 \
-       -r 24 \
-       "$output"
+    ffmpeg \
+        -ss "$from" \
+        -to "$to" \
+        -r 120 \
+        -i "$input" \
+        -vf "setpts=5*PTS,
+             crop=ih*(1+sqrt(5))/2:ih,
+             format=yuv420p" \
+        -c:v libsvtav1 \
+        -crf 28 \
+        -preset 8 \
+        -r 24 \
+        "$output"
+    ffmpeg \
+        -ss "$from" \
+        -to "$to" \
+        -r 120 \
+        -i "$input" \
+        -vf "setpts=5*PTS,
+             crop=ih*(1+sqrt(5))/2:ih,
+             scale=404:250,
+             format=yuv420p" \
+        -c:v libsvtav1 \
+        -crf 28 \
+        -preset 8 \
+        -r 24 \
+        "$thumbnail"
+    mv "$thumbnail" "${thumbnail%.avif}"
 else
     ffmpeg \
         -r 120 \
@@ -37,8 +53,21 @@ else
              crop=ih*(1+sqrt(5))/2:ih,
              format=yuv420p" \
         -c:v libsvtav1 \
-        -crf 20 \
+        -crf 28 \
         -preset 8 \
         -r 24 \
         "$output"
+    ffmpeg \
+        -r 120 \
+        -i "$input" \
+        -vf "setpts=5*PTS,
+             crop=ih*(1+sqrt(5))/2:ih,
+             scale=404:250,
+             format=yuv420p" \
+        -c:v libsvtav1 \
+        -crf 28 \
+        -preset 8 \
+        -r 24 \
+        "$thumbnail"
+    mv "$thumbnail" "${thumbnail%.avif}"
 fi
