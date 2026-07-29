@@ -4,10 +4,15 @@
 
 if [[ -z "$1" ]]
 then
-    echo "Usage: avif video.MOV 00:00:01.5 00:00:02.5"
+    echo "Usage: avif video.MOV [00:00:01.5 00:00:02.5]"
     exit 1
 fi
 
+zoom=1
+stretch=5
+filter="setpts=$stretch*PTS,fps=24,
+        scale=iw*$zoom:ih*$zoom,
+        crop=round((ih/$zoom)*610/377/2)*2:round(ih/$zoom/2)*2:(iw-ow)/2:(ih-oh)/2"
 input="$1"
 output="${1%.*}.avif"
 thumbnail="${1%.*}.thumbnail.avif"
@@ -20,54 +25,42 @@ then
     ffmpeg \
         -ss "$from" \
         -to "$to" \
-        -r 120 \
         -i "$input" \
-        -vf "setpts=5*PTS,
-             crop=ih*(1+sqrt(5))/2:ih,
+        -vf "$filter,
              format=yuv420p" \
         -c:v libsvtav1 \
         -crf 28 \
         -preset 8 \
-        -r 24 \
         "$output"
     ffmpeg \
         -ss "$from" \
         -to "$to" \
-        -r 120 \
         -i "$input" \
-        -vf "setpts=5*PTS,
-             crop=ih*(1+sqrt(5))/2:ih,
-             scale=404:250,
+        -vf "$filter,
+             scale=610:376,
              format=yuv420p" \
         -c:v libsvtav1 \
         -crf 28 \
         -preset 8 \
-        -r 24 \
         "$thumbnail"
     mv "$thumbnail" "${thumbnail%.avif}"
 else
     ffmpeg \
-        -r 120 \
         -i "$input" \
-        -vf "setpts=5*PTS,
-             crop=ih*(1+sqrt(5))/2:ih,
+        -vf "$filter,
              format=yuv420p" \
         -c:v libsvtav1 \
         -crf 28 \
         -preset 8 \
-        -r 24 \
         "$output"
     ffmpeg \
-        -r 120 \
         -i "$input" \
-        -vf "setpts=5*PTS,
-             crop=ih*(1+sqrt(5))/2:ih,
-             scale=404:250,
+        -vf "$filter,
+             scale=610:376,
              format=yuv420p" \
         -c:v libsvtav1 \
         -crf 28 \
         -preset 8 \
-        -r 24 \
         "$thumbnail"
     mv "$thumbnail" "${thumbnail%.avif}"
 fi
